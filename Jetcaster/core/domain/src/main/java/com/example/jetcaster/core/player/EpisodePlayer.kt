@@ -16,11 +16,14 @@
 
 package com.example.jetcaster.core.player
 
+import androidx.compose.runtime.Immutable
 import com.example.jetcaster.core.player.model.PlayerEpisode
 import java.time.Duration
 import kotlinx.coroutines.flow.StateFlow
 
 val DefaultPlaybackSpeed = Duration.ofSeconds(1)
+
+@Immutable
 data class EpisodePlayerState(
     val currentEpisode: PlayerEpisode? = null,
     val queue: List<PlayerEpisode> = emptyList(),
@@ -53,8 +56,8 @@ interface EpisodePlayer {
     fun addToQueue(episode: PlayerEpisode)
 
     /*
-    * Flushes the queue
-    */
+     * Flushes the queue
+     */
     fun removeAllFromQueue()
 
     /**

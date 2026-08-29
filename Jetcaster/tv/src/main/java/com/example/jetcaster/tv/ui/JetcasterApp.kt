@@ -21,12 +21,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -35,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -44,6 +39,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.NavigationDrawer
 import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Text
+import com.example.jetcaster.tv.R
 import com.example.jetcaster.tv.ui.discover.DiscoverScreen
 import com.example.jetcaster.tv.ui.episode.EpisodeScreen
 import com.example.jetcaster.tv.ui.library.LibraryScreen
@@ -64,7 +60,7 @@ fun JetcasterApp(jetcasterAppState: JetcasterAppState = rememberJetcasterAppStat
 private fun GlobalNavigationContainer(
     jetcasterAppState: JetcasterAppState,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val (discover, library) = remember { FocusRequester.createRefs() }
     val currentRoute
@@ -77,7 +73,7 @@ private fun GlobalNavigationContainer(
                 modifier = Modifier
                     .padding(JetcasterAppDefaults.overScanMargin.drawer.intoPaddingValues())
                     .focusProperties {
-                        enter = {
+                        onEnter = {
                             when (currentRoute) {
                                 Screen.Discover.route -> discover
                                 Screen.Library.route -> library
@@ -85,18 +81,18 @@ private fun GlobalNavigationContainer(
                             }
                         }
                     }
-                    .focusGroup()
+                    .focusGroup(),
             ) {
                 NavigationDrawerItem(
                     selected = isClosed && currentRoute == Screen.Profile.route,
                     onClick = jetcasterAppState::navigateToProfile,
-                    leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+                    leadingContent = { Icon(painterResource(id = R.drawable.ic_person), contentDescription = null) },
                 ) {
                     Column {
                         Text(text = "Name")
                         Text(
                             text = "Switch Account",
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
                         )
                     }
                 }
@@ -106,10 +102,10 @@ private fun GlobalNavigationContainer(
                     onClick = jetcasterAppState::navigateToSearch,
                     leadingContent = {
                         Icon(
-                            Icons.Default.Search,
-                            contentDescription = null
+                            painterResource(id = R.drawable.ic_search),
+                            contentDescription = null,
                         )
-                    }
+                    },
                 ) {
                     Text(text = "Search")
                 }
@@ -118,11 +114,11 @@ private fun GlobalNavigationContainer(
                     onClick = jetcasterAppState::navigateToDiscover,
                     leadingContent = {
                         Icon(
-                            Icons.Default.Home,
-                            contentDescription = null
+                            painterResource(id = R.drawable.ic_home),
+                            contentDescription = null,
                         )
                     },
-                    modifier = Modifier.focusRequester(discover)
+                    modifier = Modifier.focusRequester(discover),
                 ) {
                     Text(text = "Discover")
                 }
@@ -131,11 +127,11 @@ private fun GlobalNavigationContainer(
                     onClick = jetcasterAppState::navigateToLibrary,
                     leadingContent = {
                         Icon(
-                            Icons.Default.VideoLibrary,
-                            contentDescription = null
+                            painterResource(id = R.drawable.ic_video_library),
+                            contentDescription = null,
                         )
                     },
-                    modifier = Modifier.focusRequester(library)
+                    modifier = Modifier.focusRequester(library),
                 ) {
                     Text(text = "Library")
                 }
@@ -143,14 +139,14 @@ private fun GlobalNavigationContainer(
                 NavigationDrawerItem(
                     selected = isClosed && currentRoute == Screen.Settings.route,
                     onClick = jetcasterAppState::navigateToSettings,
-                    leadingContent = { Icon(Icons.Default.Settings, contentDescription = null) }
+                    leadingContent = { Icon(painterResource(id = R.drawable.ic_settings), contentDescription = null) },
                 ) {
                     Text(text = "Settings")
                 }
             }
         },
         content = content,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -166,7 +162,7 @@ private fun Route(jetcasterAppState: JetcasterAppState) {
                     playEpisode = {
                         jetcasterAppState.playEpisode()
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }
@@ -181,7 +177,7 @@ private fun Route(jetcasterAppState: JetcasterAppState) {
                     playEpisode = {
                         jetcasterAppState.playEpisode()
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }
@@ -193,7 +189,7 @@ private fun Route(jetcasterAppState: JetcasterAppState) {
                 },
                 modifier = Modifier
                     .padding(JetcasterAppDefaults.overScanMargin.default.intoPaddingValues())
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         }
 
@@ -231,7 +227,7 @@ private fun Route(jetcasterAppState: JetcasterAppState) {
             ProfileScreen(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(JetcasterAppDefaults.overScanMargin.default.intoPaddingValues())
+                    .padding(JetcasterAppDefaults.overScanMargin.default.intoPaddingValues()),
             )
         }
 
@@ -239,7 +235,7 @@ private fun Route(jetcasterAppState: JetcasterAppState) {
             SettingsScreen(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(JetcasterAppDefaults.overScanMargin.default.intoPaddingValues())
+                    .padding(JetcasterAppDefaults.overScanMargin.default.intoPaddingValues()),
             )
         }
     }

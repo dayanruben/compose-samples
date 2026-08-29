@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,7 +30,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -50,11 +50,12 @@ fun LibraryScreen(
     navigateToDiscover: () -> Unit,
     showPodcastDetails: (PodcastInfo) -> Unit,
     playEpisode: (PlayerEpisode) -> Unit,
-    libraryScreenViewModel: LibraryScreenViewModel = hiltViewModel()
+    libraryScreenViewModel: LibraryScreenViewModel = hiltViewModel(),
 ) {
-    val uiState by libraryScreenViewModel.uiState.collectAsState()
+    val uiState by libraryScreenViewModel.uiState.collectAsStateWithLifecycle()
     when (val s = uiState) {
         LibraryScreenUiState.Loading -> Loading(modifier = modifier)
+
         LibraryScreenUiState.NoSubscribedPodcast -> {
             NavigateToDiscover(onNavigationRequested = navigateToDiscover, modifier = modifier)
         }
@@ -93,15 +94,12 @@ private fun Library(
         onEpisodeSelected = onEpisodeSelected,
         modifier = modifier
             .focusRequester(focusRequester)
-            .focusRestorer()
+            .focusRestorer(),
     )
 }
 
 @Composable
-private fun NavigateToDiscover(
-    onNavigationRequested: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun NavigateToDiscover(onNavigationRequested: () -> Unit, modifier: Modifier = Modifier) {
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -110,14 +108,14 @@ private fun NavigateToDiscover(
         Column {
             Text(
                 text = stringResource(id = R.string.display_no_subscribed_podcast),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
             )
             Text(text = stringResource(id = R.string.message_no_subscribed_podcast))
             Button(
                 onClick = onNavigationRequested,
                 modifier = Modifier
                     .padding(top = JetcasterAppDefaults.gap.podcastRow)
-                    .focusRequester(focusRequester)
+                    .focusRequester(focusRequester),
             ) {
                 Text(text = stringResource(id = R.string.label_navigate_to_discover))
             }

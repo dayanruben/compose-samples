@@ -21,9 +21,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.ListAlt
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -34,44 +31,49 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import com.example.jetnews.R
+import com.example.jetnews.ui.home.HomeKey
+import com.example.jetnews.ui.navigation.NAVIGATION_ITEMS
+import com.example.jetnews.ui.navigation.NavigationItem
 import com.example.jetnews.ui.theme.JetnewsTheme
 
 @Composable
 fun AppDrawer(
     drawerState: DrawerState,
-    currentRoute: String,
-    navigateToHome: () -> Unit,
-    navigateToInterests: () -> Unit,
+    currentTopLevelKey: NavKey,
+    navigate: (NavKey) -> Unit,
+    navigationItems: List<NavigationItem>,
     closeDrawer: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ModalDrawerSheet(
         drawerState = drawerState,
         modifier = modifier,
     ) {
         JetNewsLogo(
-            modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp)
+            modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp),
         )
-        NavigationDrawerItem(
-            label = { Text(stringResource(id = R.string.home_title)) },
-            icon = { Icon(Icons.Filled.Home, null) },
-            selected = currentRoute == JetnewsDestinations.HOME_ROUTE,
-            onClick = { navigateToHome(); closeDrawer() },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
-        NavigationDrawerItem(
-            label = { Text(stringResource(id = R.string.interests_title)) },
-            icon = { Icon(Icons.Filled.ListAlt, null) },
-            selected = currentRoute == JetnewsDestinations.INTERESTS_ROUTE,
-            onClick = { navigateToInterests(); closeDrawer() },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
+        navigationItems.forEach { navigationItem ->
+            key(navigationItem.navKey) {
+                NavigationDrawerItem(
+                    label = { Text(stringResource(id = navigationItem.labelResourceId)) },
+                    icon = { Icon(painterResource(navigationItem.iconResourceId), null) },
+                    selected = currentTopLevelKey == navigationItem.navKey,
+                    onClick = {
+                        navigate(navigationItem.navKey)
+                        closeDrawer()
+                    },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                )
+            }
+        }
     }
 }
 
@@ -81,13 +83,13 @@ private fun JetNewsLogo(modifier: Modifier = Modifier) {
         Icon(
             painterResource(R.drawable.ic_jetnews_logo),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(Modifier.width(8.dp))
         Icon(
             painter = painterResource(R.drawable.ic_jetnews_wordmark),
             contentDescription = stringResource(R.string.app_name),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -99,10 +101,10 @@ fun PreviewAppDrawer() {
     JetnewsTheme {
         AppDrawer(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
-            currentRoute = JetnewsDestinations.HOME_ROUTE,
-            navigateToHome = {},
-            navigateToInterests = {},
-            closeDrawer = { }
+            currentTopLevelKey = HomeKey,
+            navigate = {},
+            navigationItems = NAVIGATION_ITEMS,
+            closeDrawer = { },
         )
     }
 }

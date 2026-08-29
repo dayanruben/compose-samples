@@ -57,12 +57,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AlternateEmail
-import androidx.compose.material.icons.outlined.Duo
-import androidx.compose.material.icons.outlined.InsertPhoto
-import androidx.compose.material.icons.outlined.Mood
-import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -93,9 +87,9 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
@@ -122,12 +116,12 @@ enum class InputSelector {
     DM,
     EMOJI,
     PHONE,
-    PICTURE
+    PICTURE,
 }
 
 enum class EmojiStickerSelector {
     EMOJI,
-    STICKER
+    STICKER,
 }
 
 @Preview
@@ -138,11 +132,7 @@ fun UserInputPreview() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun UserInput(
-    onMessageSent: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    resetScroll: () -> Unit = {},
-) {
+fun UserInput(onMessageSent: (String) -> Unit, modifier: Modifier = Modifier, resetScroll: () -> Unit = {}) {
     var currentInputSelector by rememberSaveable { mutableStateOf(InputSelector.NONE) }
     val dismissKeyboard = { currentInputSelector = InputSelector.NONE }
 
@@ -180,7 +170,7 @@ fun UserInput(
                     // Move scroll to bottom
                     resetScroll()
                 },
-                focusState = textFieldFocusState
+                focusState = textFieldFocusState,
             )
             UserInputSelector(
                 onSelectorChange = { currentInputSelector = it },
@@ -193,12 +183,12 @@ fun UserInput(
                     resetScroll()
                     dismissKeyboard()
                 },
-                currentInputSelector = currentInputSelector
+                currentInputSelector = currentInputSelector,
             )
             SelectorExpanded(
                 onCloseRequested = dismissKeyboard,
                 onTextAdded = { textState = textState.addText(it) },
-                currentSelector = currentInputSelector
+                currentSelector = currentInputSelector,
             )
         }
     }
@@ -208,26 +198,22 @@ private fun TextFieldValue.addText(newString: String): TextFieldValue {
     val newText = this.text.replaceRange(
         this.selection.start,
         this.selection.end,
-        newString
+        newString,
     )
     val newSelection = TextRange(
         start = newText.length,
-        end = newText.length
+        end = newText.length,
     )
 
     return this.copy(text = newText, selection = newSelection)
 }
 
 @Composable
-private fun SelectorExpanded(
-    currentSelector: InputSelector,
-    onCloseRequested: () -> Unit,
-    onTextAdded: (String) -> Unit
-) {
+private fun SelectorExpanded(currentSelector: InputSelector, onCloseRequested: () -> Unit, onTextAdded: (String) -> Unit) {
     if (currentSelector == InputSelector.NONE) return
 
     // Request focus to force the TextField to lose it
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     // If the selector is shown, always request focus to trigger a TextField.onFocusChange.
     SideEffect {
         if (currentSelector == InputSelector.EMOJI) {
@@ -242,9 +228,7 @@ private fun SelectorExpanded(
             InputSelector.PICTURE -> FunctionalityNotAvailablePanel()
             InputSelector.MAP -> FunctionalityNotAvailablePanel()
             InputSelector.PHONE -> FunctionalityNotAvailablePanel()
-            else -> {
-                throw NotImplementedError()
-            }
+            InputSelector.NONE -> Unit
         }
     }
 }
@@ -254,7 +238,7 @@ fun FunctionalityNotAvailablePanel() {
     AnimatedVisibility(
         visibleState = remember { MutableTransitionState(false).apply { targetState = true } },
         enter = expandHorizontally() + fadeIn(),
-        exit = shrinkHorizontally() + fadeOut()
+        exit = shrinkHorizontally() + fadeOut(),
     ) {
         Column(
             modifier = Modifier
@@ -265,13 +249,13 @@ fun FunctionalityNotAvailablePanel() {
         ) {
             Text(
                 text = stringResource(id = R.string.not_available),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             Text(
                 text = stringResource(id = R.string.not_available_subtitle),
                 modifier = Modifier.paddingFrom(FirstBaseline, before = 32.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -283,50 +267,50 @@ private fun UserInputSelector(
     sendMessageEnabled: Boolean,
     onMessageSent: () -> Unit,
     currentInputSelector: InputSelector,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .height(72.dp)
             .wrapContentHeight()
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.EMOJI) },
-            icon = Icons.Outlined.Mood,
+            icon = painterResource(id = R.drawable.ic_mood),
             selected = currentInputSelector == InputSelector.EMOJI,
-            description = stringResource(id = R.string.emoji_selector_bt_desc)
+            description = stringResource(id = R.string.emoji_selector_bt_desc),
         )
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.DM) },
-            icon = Icons.Outlined.AlternateEmail,
+            icon = painterResource(id = R.drawable.ic_alternate_email),
             selected = currentInputSelector == InputSelector.DM,
-            description = stringResource(id = R.string.dm_desc)
+            description = stringResource(id = R.string.dm_desc),
         )
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.PICTURE) },
-            icon = Icons.Outlined.InsertPhoto,
+            icon = painterResource(id = R.drawable.ic_insert_photo),
             selected = currentInputSelector == InputSelector.PICTURE,
-            description = stringResource(id = R.string.attach_photo_desc)
+            description = stringResource(id = R.string.attach_photo_desc),
         )
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.MAP) },
-            icon = Icons.Outlined.Place,
+            icon = painterResource(id = R.drawable.ic_place),
             selected = currentInputSelector == InputSelector.MAP,
-            description = stringResource(id = R.string.map_selector_desc)
+            description = stringResource(id = R.string.map_selector_desc),
         )
         InputSelectorButton(
             onClick = { onSelectorChange(InputSelector.PHONE) },
-            icon = Icons.Outlined.Duo,
+            icon = painterResource(id = R.drawable.ic_duo),
             selected = currentInputSelector == InputSelector.PHONE,
-            description = stringResource(id = R.string.videochat_desc)
+            description = stringResource(id = R.string.videochat_desc),
         )
 
         val border = if (!sendMessageEnabled) {
             BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
             )
         } else {
             null
@@ -337,7 +321,7 @@ private fun UserInputSelector(
 
         val buttonColors = ButtonDefaults.buttonColors(
             disabledContainerColor = Color.Transparent,
-            disabledContentColor = disabledContentColor
+            disabledContentColor = disabledContentColor,
         )
 
         // Send button
@@ -347,11 +331,11 @@ private fun UserInputSelector(
             onClick = onMessageSent,
             colors = buttonColors,
             border = border,
-            contentPadding = PaddingValues(0.dp)
+            contentPadding = PaddingValues(0.dp),
         ) {
             Text(
                 stringResource(id = R.string.send),
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
     }
@@ -360,22 +344,22 @@ private fun UserInputSelector(
 @Composable
 private fun InputSelectorButton(
     onClick: () -> Unit,
-    icon: ImageVector,
+    icon: androidx.compose.ui.graphics.painter.Painter,
     description: String,
     selected: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backgroundModifier = if (selected) {
         Modifier.background(
             color = LocalContentColor.current,
-            shape = RoundedCornerShape(14.dp)
+            shape = RoundedCornerShape(14.dp),
         )
     } else {
         Modifier
     }
     IconButton(
         onClick = onClick,
-        modifier = modifier.then(backgroundModifier)
+        modifier = modifier.then(backgroundModifier),
     ) {
         val tint = if (selected) {
             contentColorFor(backgroundColor = LocalContentColor.current)
@@ -388,7 +372,7 @@ private fun InputSelectorButton(
             modifier = Modifier
                 .padding(8.dp)
                 .size(56.dp),
-            contentDescription = description
+            contentDescription = description,
         )
     }
 }
@@ -411,7 +395,7 @@ private fun UserInputText(
     keyboardShown: Boolean,
     onTextFieldFocused: (Boolean) -> Unit,
     onMessageSent: (String) -> Unit,
-    focusState: Boolean
+    focusState: Boolean,
 ) {
     val swipeOffset = remember { mutableStateOf(0f) }
     var isRecordingMessage by remember { mutableStateOf(false) }
@@ -420,14 +404,14 @@ private fun UserInputText(
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp),
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.End,
     ) {
         AnimatedContent(
             targetState = isRecordingMessage,
             label = "text-field",
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight()
+                .fillMaxHeight(),
         ) { recording ->
             Box(Modifier.fillMaxSize()) {
                 if (recording) {
@@ -443,7 +427,7 @@ private fun UserInputText(
                         Modifier.fillMaxWidth().semantics {
                             contentDescription = a11ylabel
                             keyboardShownProperty = keyboardShown
-                        }
+                        },
                     )
                 }
             }
@@ -464,7 +448,7 @@ private fun UserInputText(
             onCancelRecording = {
                 isRecordingMessage = false
             },
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier.fillMaxHeight(),
         )
     }
 }
@@ -477,7 +461,7 @@ private fun BoxScope.UserInputTextField(
     keyboardType: KeyboardType,
     focusState: Boolean,
     onMessageSent: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var lastFocusState by remember { mutableStateOf(false) }
     BasicTextField(
@@ -494,14 +478,14 @@ private fun BoxScope.UserInputTextField(
             },
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
-            imeAction = ImeAction.Send
+            imeAction = ImeAction.Send,
         ),
         keyboardActions = KeyboardActions {
             if (textFieldValue.text.isNotBlank()) onMessageSent(textFieldValue.text)
         },
         maxLines = 1,
         cursorBrush = SolidColor(LocalContentColor.current),
-        textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current)
+        textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current),
     )
 
     val disableContentColor =
@@ -512,7 +496,7 @@ private fun BoxScope.UserInputTextField(
                 .align(Alignment.CenterStart)
                 .padding(start = 32.dp),
             text = stringResource(R.string.textfield_hint),
-            style = MaterialTheme.typography.bodyLarge.copy(color = disableContentColor)
+            style = MaterialTheme.typography.bodyLarge.copy(color = disableContentColor),
         )
     }
 }
@@ -528,7 +512,7 @@ private fun RecordingIndicator(swipeOffset: () -> Float) {
     }
     Row(
         Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         val infiniteTransition = rememberInfiniteTransition(label = "pulse")
 
@@ -537,7 +521,7 @@ private fun RecordingIndicator(swipeOffset: () -> Float) {
             targetValue = 0.2f,
             animationSpec = infiniteRepeatable(
                 tween(2000),
-                repeatMode = RepeatMode.Reverse
+                repeatMode = RepeatMode.Reverse,
             ),
             label = "pulse",
         )
@@ -546,10 +530,11 @@ private fun RecordingIndicator(swipeOffset: () -> Float) {
                 .size(56.dp)
                 .padding(24.dp)
                 .graphicsLayer {
-                    scaleX = animatedPulse.value; scaleY = animatedPulse.value
+                    scaleX = animatedPulse.value
+                    scaleY = animatedPulse.value
                 }
                 .clip(CircleShape)
-                .background(Color.Red)
+                .background(Color.Red),
         )
         Text(
             duration.toComponents { minutes, seconds, _ ->
@@ -557,13 +542,13 @@ private fun RecordingIndicator(swipeOffset: () -> Float) {
                 val sec = seconds.toString().padStart(2, '0')
                 "$min:$sec"
             },
-            Modifier.alignByBaseline()
+            Modifier.alignByBaseline(),
         )
         Box(
             Modifier
                 .fillMaxSize()
                 .alignByBaseline()
-                .clipToBounds()
+                .clipToBounds(),
         ) {
             val swipeThreshold = with(LocalDensity.current) { 200.dp.toPx() }
             Text(
@@ -575,17 +560,14 @@ private fun RecordingIndicator(swipeOffset: () -> Float) {
                     },
                 textAlign = TextAlign.Center,
                 text = stringResource(R.string.swipe_to_cancel_recording),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }
 }
 
 @Composable
-fun EmojiSelector(
-    onTextAdded: (String) -> Unit,
-    focusRequester: FocusRequester
-) {
+fun EmojiSelector(onTextAdded: (String) -> Unit, focusRequester: FocusRequester) {
     var selected by remember { mutableStateOf(EmojiStickerSelector.EMOJI) }
 
     val a11yLabel = stringResource(id = R.string.emoji_selector_desc)
@@ -594,24 +576,24 @@ fun EmojiSelector(
             .focusRequester(focusRequester) // Requests focus when the Emoji selector is displayed
             // Make the emoji selector focusable so it can steal focus from TextField
             .focusTarget()
-            .semantics { contentDescription = a11yLabel }
+            .semantics { contentDescription = a11yLabel },
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 8.dp),
         ) {
             ExtendedSelectorInnerButton(
                 text = stringResource(id = R.string.emojis_label),
                 onClick = { selected = EmojiStickerSelector.EMOJI },
                 selected = true,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             ExtendedSelectorInnerButton(
                 text = stringResource(id = R.string.stickers_label),
                 onClick = { selected = EmojiStickerSelector.STICKER },
                 selected = false,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
         Row(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -624,18 +606,13 @@ fun EmojiSelector(
 }
 
 @Composable
-fun ExtendedSelectorInnerButton(
-    text: String,
-    onClick: () -> Unit,
-    selected: Boolean,
-    modifier: Modifier = Modifier
-) {
+fun ExtendedSelectorInnerButton(text: String, onClick: () -> Unit, selected: Boolean, modifier: Modifier = Modifier) {
     val colors = ButtonDefaults.buttonColors(
         containerColor = if (selected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
         else Color.Transparent,
         disabledContainerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.74f)
+        disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.74f),
     )
     TextButton(
         onClick = onClick,
@@ -643,25 +620,22 @@ fun ExtendedSelectorInnerButton(
             .padding(8.dp)
             .height(36.dp),
         colors = colors,
-        contentPadding = PaddingValues(0.dp)
+        contentPadding = PaddingValues(0.dp),
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.titleSmall,
         )
     }
 }
 
 @Composable
-fun EmojiTable(
-    onTextAdded: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun EmojiTable(onTextAdded: (String) -> Unit, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth()) {
         repeat(4) { x ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 repeat(EMOJI_COLUMNS) { y ->
                     val emoji = emojis[x * EMOJI_COLUMNS + y]
@@ -673,8 +647,8 @@ fun EmojiTable(
                         text = emoji,
                         style = LocalTextStyle.current.copy(
                             fontSize = 18.sp,
-                            textAlign = TextAlign.Center
-                        )
+                            textAlign = TextAlign.Center,
+                        ),
                     )
                 }
             }
@@ -812,5 +786,5 @@ private val emojis = listOf(
     "\ud83d\udc6b", // Man and Woman Holding Hands
     "\ud83d\udc6c", // Two Men Holding Hands
     "\ud83d\udc6d", // Two Women Holding Hands
-    "\ud83d\udc8f" // Kiss
+    "\ud83d\udc8f", // Kiss
 )

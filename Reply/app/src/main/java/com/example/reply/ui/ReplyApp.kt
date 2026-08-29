@@ -54,7 +54,7 @@ fun ReplyApp(
     replyHomeUIState: ReplyHomeUIState,
     closeDetailScreen: () -> Unit = {},
     navigateToDetail: (Long, ReplyContentType) -> Unit = { _, _ -> },
-    toggleSelectedEmail: (Long) -> Unit = { }
+    toggleSelectedEmail: (Long) -> Unit = { },
 ) {
     /**
      * We are using display's folding features to map the device postures a fold is in.
@@ -75,12 +75,15 @@ fun ReplyApp(
 
     val contentType = when (windowSize.widthSizeClass) {
         WindowWidthSizeClass.Compact -> ReplyContentType.SINGLE_PANE
+
         WindowWidthSizeClass.Medium -> if (foldingDevicePosture != DevicePosture.NormalPosture) {
             ReplyContentType.DUAL_PANE
         } else {
             ReplyContentType.SINGLE_PANE
         }
+
         WindowWidthSizeClass.Expanded -> ReplyContentType.DUAL_PANE
+
         else -> ReplyContentType.SINGLE_PANE
     }
 
@@ -94,7 +97,7 @@ fun ReplyApp(
     Surface {
         ReplyNavigationWrapper(
             currentDestination = currentDestination,
-            navigateToTopLevelDestination = navigationActions::navigateTo
+            navigateToTopLevelDestination = navigationActions::navigateTo,
         ) {
             ReplyNavHost(
                 navController = navController,
@@ -135,7 +138,7 @@ private fun ReplyNavHost(
                 displayFeatures = displayFeatures,
                 closeDetailScreen = closeDetailScreen,
                 navigateToDetail = navigateToDetail,
-                toggleSelectedEmail = toggleSelectedEmail
+                toggleSelectedEmail = toggleSelectedEmail,
             )
         }
         composable<Route.DirectMessages> {

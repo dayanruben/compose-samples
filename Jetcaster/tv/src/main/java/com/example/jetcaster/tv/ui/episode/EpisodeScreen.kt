@@ -24,12 +24,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.example.jetcaster.core.player.model.PlayerEpisode
@@ -48,15 +48,17 @@ fun EpisodeScreen(
     playEpisode: () -> Unit,
     backToHome: () -> Unit,
     modifier: Modifier = Modifier,
-    episodeScreenViewModel: EpisodeScreenViewModel = hiltViewModel()
+    episodeScreenViewModel: EpisodeScreenViewModel = hiltViewModel(),
 ) {
 
-    val uiState by episodeScreenViewModel.uiStateFlow.collectAsState()
+    val uiState by episodeScreenViewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     val screenModifier = modifier.fillMaxSize()
     when (val s = uiState) {
         EpisodeScreenUiState.Loading -> Loading(modifier = screenModifier)
+
         EpisodeScreenUiState.Error -> ErrorState(backToHome = backToHome, modifier = screenModifier)
+
         is EpisodeScreenUiState.Ready -> EpisodeDetailsWithBackground(
             playerEpisode = s.playerEpisode,
             playEpisode = {
@@ -64,7 +66,7 @@ fun EpisodeScreen(
                 playEpisode()
             },
             addPlayList = episodeScreenViewModel::addPlayList,
-            modifier = screenModifier
+            modifier = screenModifier,
         )
     }
 }
@@ -79,14 +81,14 @@ private fun EpisodeDetailsWithBackground(
     BackgroundContainer(
         playerEpisode = playerEpisode,
         contentAlignment = Alignment.Center,
-        modifier = modifier
+        modifier = modifier,
     ) {
         EpisodeDetails(
             playerEpisode = playerEpisode,
             playEpisode = playEpisode,
             addPlayList = addPlayList,
             modifier = Modifier
-                .padding(JetcasterAppDefaults.overScanMargin.episode.intoPaddingValues())
+                .padding(JetcasterAppDefaults.overScanMargin.episode.intoPaddingValues()),
         )
     }
 }
@@ -102,7 +104,7 @@ private fun EpisodeDetails(
         first = {
             Thumbnail(
                 episode = playerEpisode,
-                size = JetcasterAppDefaults.thumbnailSize.episodeDetails
+                size = JetcasterAppDefaults.thumbnailSize.episodeDetails,
             )
         },
         second = {
@@ -110,7 +112,7 @@ private fun EpisodeDetails(
                 playerEpisode = playerEpisode,
                 playEpisode = { playEpisode(playerEpisode) },
                 addPlayList = { addPlayList(playerEpisode) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         },
         modifier = modifier,
@@ -118,12 +120,7 @@ private fun EpisodeDetails(
 }
 
 @Composable
-private fun EpisodeInfo(
-    playerEpisode: PlayerEpisode,
-    playEpisode: () -> Unit,
-    addPlayList: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun EpisodeInfo(playerEpisode: PlayerEpisode, playEpisode: () -> Unit, addPlayList: () -> Unit, modifier: Modifier = Modifier) {
     val duration = playerEpisode.duration
 
     Column(modifier) {
@@ -137,7 +134,7 @@ private fun EpisodeInfo(
             text = playerEpisode.summary,
             softWrap = true,
             maxLines = 5,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.height(JetcasterAppDefaults.gap.paragraph))
         Controls(playEpisode = playEpisode, addPlayList = addPlayList)
@@ -145,15 +142,11 @@ private fun EpisodeInfo(
 }
 
 @Composable
-private fun Controls(
-    playEpisode: () -> Unit,
-    addPlayList: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun Controls(playEpisode: () -> Unit, addPlayList: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(JetcasterAppDefaults.gap.item),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier = modifier,
     ) {
         PlayButton(onClick = playEpisode)
         EnqueueButton(onClick = addPlayList)

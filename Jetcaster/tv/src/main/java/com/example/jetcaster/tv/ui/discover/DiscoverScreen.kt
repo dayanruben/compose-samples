@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -30,7 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Tab
 import androidx.tv.material3.TabRow
 import androidx.tv.material3.Text
@@ -49,16 +49,16 @@ fun DiscoverScreen(
     showPodcastDetails: (PodcastInfo) -> Unit,
     playEpisode: (PlayerEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    discoverScreenViewModel: DiscoverScreenViewModel = hiltViewModel()
+    discoverScreenViewModel: DiscoverScreenViewModel = hiltViewModel(),
 ) {
-    val uiState by discoverScreenViewModel.uiState.collectAsState()
+    val uiState by discoverScreenViewModel.uiState.collectAsStateWithLifecycle()
 
     when (val s = uiState) {
         DiscoverScreenUiState.Loading -> {
             Loading(
                 modifier = Modifier
                     .fillMaxSize()
-                    .then(modifier)
+                    .then(modifier),
             )
         }
 
@@ -76,7 +76,7 @@ fun DiscoverScreen(
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .then(modifier)
+                    .then(modifier),
             )
         }
     }
@@ -87,7 +87,6 @@ fun DiscoverScreen(
 private fun CatalogWithCategorySelection(
     categoryInfoList: CategoryInfoList,
     podcastList: PodcastList,
-
     selectedCategory: CategoryInfo,
     latestEpisodeList: EpisodeList,
     onPodcastSelected: (PodcastInfo) -> Unit,
@@ -121,10 +120,10 @@ private fun CatalogWithCategorySelection(
         TabRow(
             selectedTabIndex = selectedTabIndex,
             modifier = Modifier.focusProperties {
-                enter = {
+                onEnter = {
                     selectedTab
                 }
-            }
+            },
         ) {
             categoryInfoList.forEachIndexed { index, category ->
                 val tabModifier = if (selectedTabIndex == index) {
@@ -142,7 +141,7 @@ private fun CatalogWithCategorySelection(
                 ) {
                     Text(
                         text = category.name,
-                        modifier = Modifier.padding(JetcasterAppDefaults.padding.tab)
+                        modifier = Modifier.padding(JetcasterAppDefaults.padding.tab),
                     )
                 }
             }

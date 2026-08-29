@@ -43,9 +43,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,6 +57,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,8 +65,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ChainStyle
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetsnack.R
@@ -93,7 +89,7 @@ import kotlin.math.roundToInt
 fun Cart(
     onSnackClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CartViewModel = viewModel(factory = CartViewModel.provideFactory())
+    viewModel: CartViewModel = viewModel(factory = CartViewModel.provideFactory()),
 ) {
     val orderLines by viewModel.orderLines.collectAsStateWithLifecycle()
     val inspiredByCart = remember { SnackRepo.getInspiredByCart() }
@@ -104,7 +100,7 @@ fun Cart(
         decreaseItemCount = viewModel::decreaseSnackCount,
         inspiredByCart = inspiredByCart,
         onSnackClick = onSnackClick,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -116,7 +112,7 @@ fun Cart(
     decreaseItemCount: (Long) -> Unit,
     inspiredByCart: SnackCollection,
     onSnackClick: (Long, String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     JetsnackSurface(modifier = modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -127,7 +123,7 @@ fun Cart(
                 decreaseItemCount = decreaseItemCount,
                 inspiredByCart = inspiredByCart,
                 onSnackClick = onSnackClick,
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter),
             )
             DestinationBar(modifier = Modifier.align(Alignment.TopCenter))
             CheckoutBar(modifier = Modifier.align(Alignment.BottomCenter))
@@ -143,13 +139,13 @@ private fun CartContent(
     decreaseItemCount: (Long) -> Unit,
     inspiredByCart: SnackCollection,
     onSnackClick: (Long, String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val resources = LocalContext.current.resources
     val snackCountFormattedString = remember(orderLines.size, resources) {
         resources.getQuantityString(
             R.plurals.cart_order_count,
-            orderLines.size, orderLines.size
+            orderLines.size, orderLines.size,
         )
     }
     val itemAnimationSpecFade = nonSpatialExpressiveSpring<Float>()
@@ -158,8 +154,8 @@ private fun CartContent(
         item(key = "title") {
             Spacer(
                 Modifier.windowInsetsTopHeight(
-                    WindowInsets.statusBars.add(WindowInsets(top = 56.dp))
-                )
+                    WindowInsets.statusBars.add(WindowInsets(top = 56.dp)),
+                ),
             )
             Text(
                 text = stringResource(R.string.cart_order_header, snackCountFormattedString),
@@ -170,7 +166,7 @@ private fun CartContent(
                 modifier = Modifier
                     .heightIn(min = 56.dp)
                     .padding(horizontal = 24.dp, vertical = 4.dp)
-                    .wrapContentHeight()
+                    .wrapContentHeight(),
             )
         }
         items(orderLines, key = { it.snack.id }) { orderLine ->
@@ -178,7 +174,7 @@ private fun CartContent(
                 modifier = Modifier.animateItem(
                     fadeInSpec = itemAnimationSpecFade,
                     fadeOutSpec = itemAnimationSpecFade,
-                    placementSpec = itemPlacementSpec
+                    placementSpec = itemPlacementSpec,
                 ),
                 background = { progress ->
                     SwipeDismissItemBackground(progress)
@@ -189,7 +185,7 @@ private fun CartContent(
                     removeSnack = removeSnack,
                     increaseItemCount = increaseItemCount,
                     decreaseItemCount = decreaseItemCount,
-                    onSnackClick = onSnackClick
+                    onSnackClick = onSnackClick,
                 )
             }
         }
@@ -198,10 +194,10 @@ private fun CartContent(
                 modifier = Modifier.animateItem(
                     fadeInSpec = itemAnimationSpecFade,
                     fadeOutSpec = itemAnimationSpecFade,
-                    placementSpec = itemPlacementSpec
+                    placementSpec = itemPlacementSpec,
                 ),
                 subtotal = orderLines.sumOf { it.snack.price * it.count },
-                shippingCosts = 369
+                shippingCosts = 369,
             )
         }
         item(key = "inspiredByCart") {
@@ -209,11 +205,11 @@ private fun CartContent(
                 modifier = Modifier.animateItem(
                     fadeInSpec = itemAnimationSpecFade,
                     fadeOutSpec = itemAnimationSpecFade,
-                    placementSpec = itemPlacementSpec
+                    placementSpec = itemPlacementSpec,
                 ),
                 snackCollection = inspiredByCart,
                 onSnackClick = onSnackClick,
-                highlight = false
+                highlight = false,
             )
             Spacer(Modifier.height(56.dp))
         }
@@ -228,15 +224,15 @@ private fun SwipeDismissItemBackground(progress: Float) {
             .fillMaxWidth()
             .fillMaxHeight(),
         horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         // Set 4.dp padding only if progress is less than halfway
         val padding: Dp by animateDpAsState(
-            if (progress < 0.5f) 4.dp else 0.dp, label = "padding"
+            if (progress < 0.5f) 4.dp else 0.dp, label = "padding",
         )
         BoxWithConstraints(
             Modifier
-                .fillMaxWidth(progress)
+                .fillMaxWidth(progress),
         ) {
             Surface(
                 modifier = Modifier
@@ -245,21 +241,21 @@ private fun SwipeDismissItemBackground(progress: Float) {
                     .height(maxWidth)
                     .align(Alignment.Center),
                 shape = RoundedCornerShape(percent = ((1 - progress) * 100).roundToInt()),
-                color = JetsnackTheme.colors.error
+                color = JetsnackTheme.colors.error,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     // Icon must be visible while in this width range
                     if (progress in 0.125f..0.475f) {
                         // Icon alpha decreases as it is about to disappear
                         val iconAlpha: Float by animateFloatAsState(
-                            if (progress > 0.4f) 0.5f else 1f, label = "icon alpha"
+                            if (progress > 0.4f) 0.5f else 1f, label = "icon alpha",
                         )
 
                         Icon(
-                            imageVector = Icons.Filled.DeleteForever,
+                            painter = painterResource(id = R.drawable.ic_delete_forever),
                             modifier = Modifier
                                 .size(32.dp)
                                 .graphicsLayer(alpha = iconAlpha),
@@ -270,7 +266,7 @@ private fun SwipeDismissItemBackground(progress: Float) {
                     /*Text opacity increases as the text is supposed to appear in
                                     the screen*/
                     val textAlpha by animateFloatAsState(
-                        if (progress > 0.5f) 1f else 0.5f, label = "text alpha"
+                        if (progress > 0.5f) 1f else 0.5f, label = "text alpha",
                     )
                     if (progress > 0.5f) {
                         Text(
@@ -280,8 +276,8 @@ private fun SwipeDismissItemBackground(progress: Float) {
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .graphicsLayer(
-                                    alpha = textAlpha
-                                )
+                                    alpha = textAlpha,
+                                ),
                         )
                     }
                 }
@@ -297,118 +293,85 @@ fun CartItem(
     increaseItemCount: (Long) -> Unit,
     decreaseItemCount: (Long) -> Unit,
     onSnackClick: (Long, String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val snack = orderLine.snack
-    ConstraintLayout(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onSnackClick(snack.id, "cart") }
             .background(JetsnackTheme.colors.uiBackground)
-            .padding(horizontal = 24.dp)
-
+            .padding(horizontal = 24.dp),
     ) {
-        val (divider, image, name, tag, priceSpacer, price, remove, quantity) = createRefs()
-        createVerticalChain(name, tag, priceSpacer, price, chainStyle = ChainStyle.Packed)
-        SnackImage(
-            imageRes = snack.imageRes,
-            contentDescription = null,
-            modifier = Modifier
-                .size(100.dp)
-                .constrainAs(image) {
-                    top.linkTo(parent.top, margin = 16.dp)
-                    bottom.linkTo(parent.bottom, margin = 16.dp)
-                    start.linkTo(parent.start)
-                }
-        )
-        Text(
-            text = snack.name,
-            style = MaterialTheme.typography.titleMedium,
-            color = JetsnackTheme.colors.textSecondary,
-            modifier = Modifier.constrainAs(name) {
-                linkTo(
-                    start = image.end,
-                    startMargin = 16.dp,
-                    end = remove.start,
-                    endMargin = 16.dp,
-                    bias = 0f
-                )
-            }
-        )
-        IconButton(
-            onClick = { removeSnack(snack.id) },
-            modifier = Modifier
-                .constrainAs(remove) {
-                    top.linkTo(parent.top)
-                    end.linkTo(parent.end)
-                }
-                .padding(top = 12.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Icon(
-                imageVector = Icons.Filled.Close,
-                tint = JetsnackTheme.colors.iconSecondary,
-                contentDescription = stringResource(R.string.label_remove)
+            SnackImage(
+                imageRes = snack.imageRes,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .size(100.dp),
             )
-        }
-        Text(
-            text = snack.tagline,
-            style = MaterialTheme.typography.bodyLarge,
-            color = JetsnackTheme.colors.textHelp,
-            modifier = Modifier.constrainAs(tag) {
-                linkTo(
-                    start = image.end,
-                    startMargin = 16.dp,
-                    end = parent.end,
-                    endMargin = 16.dp,
-                    bias = 0f
-                )
-            }
-        )
-        Spacer(
-            Modifier
-                .height(8.dp)
-                .constrainAs(priceSpacer) {
-                    linkTo(top = tag.bottom, bottom = price.top)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp),
+            ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = snack.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = JetsnackTheme.colors.textSecondary,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(top = 16.dp, end = 16.dp),
+                    )
+                    IconButton(
+                        onClick = { removeSnack(snack.id) },
+                        modifier = Modifier.padding(top = 12.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_close),
+                            tint = JetsnackTheme.colors.iconSecondary,
+                            contentDescription = stringResource(R.string.label_remove),
+                        )
+                    }
                 }
-        )
-        Text(
-            text = formatPrice(snack.price),
-            style = MaterialTheme.typography.titleMedium,
-            color = JetsnackTheme.colors.textPrimary,
-            modifier = Modifier.constrainAs(price) {
-                linkTo(
-                    start = image.end,
-                    end = quantity.start,
-                    startMargin = 16.dp,
-                    endMargin = 16.dp,
-                    bias = 0f
+                Text(
+                    text = snack.tagline,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = JetsnackTheme.colors.textHelp,
+                    modifier = Modifier.padding(end = 16.dp),
                 )
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        text = formatPrice(snack.price),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = JetsnackTheme.colors.textPrimary,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 16.dp)
+                            .alignBy(LastBaseline),
+                    )
+                    QuantitySelector(
+                        count = orderLine.count,
+                        decreaseItemCount = { decreaseItemCount(snack.id) },
+                        increaseItemCount = { increaseItemCount(snack.id) },
+                        modifier = Modifier.alignBy(LastBaseline),
+                    )
+                }
             }
-        )
-        QuantitySelector(
-            count = orderLine.count,
-            decreaseItemCount = { decreaseItemCount(snack.id) },
-            increaseItemCount = { increaseItemCount(snack.id) },
-            modifier = Modifier.constrainAs(quantity) {
-                baseline.linkTo(price.baseline)
-                end.linkTo(parent.end)
-            }
-        )
-        JetsnackDivider(
-            Modifier.constrainAs(divider) {
-                linkTo(start = parent.start, end = parent.end)
-                top.linkTo(parent.bottom)
-            }
-        )
+        }
+        JetsnackDivider()
     }
 }
 
 @Composable
-fun SummaryItem(
-    subtotal: Long,
-    shippingCosts: Long,
-    modifier: Modifier = Modifier
-) {
+fun SummaryItem(subtotal: Long, shippingCosts: Long, modifier: Modifier = Modifier) {
     Column(modifier) {
         Text(
             text = stringResource(R.string.cart_summary_header),
@@ -419,7 +382,7 @@ fun SummaryItem(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
                 .heightIn(min = 56.dp)
-                .wrapContentHeight()
+                .wrapContentHeight(),
         )
         Row(modifier = Modifier.padding(horizontal = 24.dp)) {
             Text(
@@ -428,12 +391,12 @@ fun SummaryItem(
                 modifier = Modifier
                     .weight(1f)
                     .wrapContentWidth(Alignment.Start)
-                    .alignBy(LastBaseline)
+                    .alignBy(LastBaseline),
             )
             Text(
                 text = formatPrice(subtotal),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.alignBy(LastBaseline)
+                modifier = Modifier.alignBy(LastBaseline),
             )
         }
         Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
@@ -443,12 +406,12 @@ fun SummaryItem(
                 modifier = Modifier
                     .weight(1f)
                     .wrapContentWidth(Alignment.Start)
-                    .alignBy(LastBaseline)
+                    .alignBy(LastBaseline),
             )
             Text(
                 text = formatPrice(shippingCosts),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.alignBy(LastBaseline)
+                modifier = Modifier.alignBy(LastBaseline),
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -461,12 +424,12 @@ fun SummaryItem(
                     .weight(1f)
                     .padding(end = 16.dp)
                     .wrapContentWidth(Alignment.End)
-                    .alignBy(LastBaseline)
+                    .alignBy(LastBaseline),
             )
             Text(
                 text = formatPrice(subtotal + shippingCosts),
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.alignBy(LastBaseline)
+                modifier = Modifier.alignBy(LastBaseline),
             )
         }
         JetsnackDivider()
@@ -477,8 +440,8 @@ fun SummaryItem(
 private fun CheckoutBar(modifier: Modifier = Modifier) {
     Column(
         modifier.background(
-            JetsnackTheme.colors.uiBackground.copy(alpha = AlphaNearOpaque)
-        )
+            JetsnackTheme.colors.uiBackground.copy(alpha = AlphaNearOpaque),
+        ),
     ) {
 
         JetsnackDivider()
@@ -489,13 +452,13 @@ private fun CheckoutBar(modifier: Modifier = Modifier) {
                 shape = RectangleShape,
                 modifier = Modifier
                     .padding(horizontal = 12.dp, vertical = 8.dp)
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 Text(
                     text = stringResource(id = R.string.cart_checkout),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Left,
-                    maxLines = 1
+                    maxLines = 1,
                 )
             }
         }
@@ -514,7 +477,7 @@ private fun CartPreview() {
             increaseItemCount = {},
             decreaseItemCount = {},
             inspiredByCart = SnackRepo.getInspiredByCart(),
-            onSnackClick = { _, _ -> }
+            onSnackClick = { _, _ -> },
         )
     }
 }

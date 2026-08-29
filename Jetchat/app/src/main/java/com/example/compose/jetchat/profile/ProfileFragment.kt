@@ -25,8 +25,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +37,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
@@ -63,11 +62,7 @@ class ProfileFragment : Fragment() {
     }
 
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView: View = inflater.inflate(R.layout.fragment_profile, container, false)
 
         rootView.findViewById<ComposeView>(R.id.toolbar_compose_view).apply {
@@ -86,7 +81,7 @@ class ProfileFragment : Fragment() {
                         actions = {
                             // More icon
                             Icon(
-                                imageVector = Icons.Outlined.MoreVert,
+                                painter = painterResource(id = R.drawable.ic_more_vert),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier
                                     .clickable(onClick = {
@@ -94,9 +89,9 @@ class ProfileFragment : Fragment() {
                                     })
                                     .padding(horizontal = 12.dp, vertical = 16.dp)
                                     .height(24.dp),
-                                contentDescription = stringResource(id = R.string.more_options)
+                                contentDescription = stringResource(id = R.string.more_options),
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -113,7 +108,7 @@ class ProfileFragment : Fragment() {
                     } else {
                         ProfileScreen(
                             userData = userData!!,
-                            nestedScrollInteropConnection = nestedScrollInteropConnection
+                            nestedScrollInteropConnection = nestedScrollInteropConnection,
                         )
                     }
                 }

@@ -18,6 +18,7 @@ package com.example.jetlagged
 
 import android.os.SystemClock
 import androidx.activity.compose.PredictiveBackHandler
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.rememberSplineBasedDecay
@@ -30,11 +31,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bedtime
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Leaderboard
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Surface
@@ -50,9 +46,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlin.coroutines.cancellation.CancellationException
@@ -62,7 +58,7 @@ import kotlinx.coroutines.launch
 fun HomeScreenDrawer(windowSizeClass: WindowSizeClass) {
 
     Surface(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         var drawerState by remember {
             mutableStateOf(DrawerState.Closed)
@@ -109,11 +105,11 @@ fun HomeScreenDrawer(windowSizeClass: WindowSizeClass) {
                     translationX.snapTo(targetSize)
                     velocityTracker.addPosition(
                         SystemClock.uptimeMillis(),
-                        Offset(backEvent.touchX, backEvent.touchY)
+                        Offset(backEvent.touchX, backEvent.touchY),
                     )
                 }
                 closeDrawer(velocityTracker.calculateVelocity().x)
-            } catch (e: CancellationException) {
+            } catch (_: CancellationException) {
                 openDrawer(velocityTracker.calculateVelocity().x)
             }
             velocityTracker.resetTracking()
@@ -123,7 +119,7 @@ fun HomeScreenDrawer(windowSizeClass: WindowSizeClass) {
             selectedScreen = screenState,
             onScreenSelected = { screen ->
                 screenState = screen
-            }
+            },
         )
 
         val draggableState = rememberDraggableState(onDelta = { dragAmount ->
@@ -154,7 +150,7 @@ fun HomeScreenDrawer(windowSizeClass: WindowSizeClass) {
                     onDragStopped = { velocity ->
                         val targetOffsetX = decay.calculateTargetValue(
                             translationX.value,
-                            velocity
+                            velocity,
                         )
                         coroutineScope.launch {
                             val actualTargetX = if (targetOffsetX > drawerWidth * 0.5) {
@@ -166,17 +162,19 @@ fun HomeScreenDrawer(windowSizeClass: WindowSizeClass) {
                             val targetDifference = (actualTargetX - targetOffsetX)
                             val canReachTargetWithDecay =
                                 (
-                                    targetOffsetX > actualTargetX && velocity > 0f &&
+                                    targetOffsetX > actualTargetX &&
+                                        velocity > 0f &&
                                         targetDifference > 0f
                                     ) ||
                                     (
-                                        targetOffsetX < actualTargetX && velocity < 0 &&
+                                        targetOffsetX < actualTargetX &&
+                                            velocity < 0 &&
                                             targetDifference < 0f
                                         )
                             if (canReachTargetWithDecay) {
                                 translationX.animateDecay(
                                     initialVelocity = velocity,
-                                    animationSpec = decay
+                                    animationSpec = decay,
                                 )
                             } else {
                                 translationX.animateTo(actualTargetX, initialVelocity = velocity)
@@ -187,8 +185,8 @@ fun HomeScreenDrawer(windowSizeClass: WindowSizeClass) {
                                 DrawerState.Closed
                             }
                         }
-                    }
-                )
+                    },
+                ),
         )
     }
 }
@@ -198,7 +196,7 @@ private fun ScreenContents(
     windowWidthSizeClass: WindowWidthSizeClass,
     selectedScreen: Screen,
     onDrawerClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier) {
         when (selectedScreen) {
@@ -206,24 +204,24 @@ private fun ScreenContents(
                 JetLaggedScreen(
                     windowSizeClass = windowWidthSizeClass,
                     modifier = Modifier,
-                    onDrawerClicked = onDrawerClicked
+                    onDrawerClicked = onDrawerClicked,
                 )
 
             Screen.SleepDetails ->
                 Surface(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 ) {
                 }
 
             Screen.Leaderboard ->
                 Surface(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 ) {
                 }
 
             Screen.Settings ->
                 Surface(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 ) {
                 }
         }
@@ -232,20 +230,16 @@ private fun ScreenContents(
 
 private enum class DrawerState {
     Open,
-    Closed
+    Closed,
 }
 
 @Composable
-private fun HomeScreenDrawerContents(
-    selectedScreen: Screen,
-    onScreenSelected: (Screen) -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun HomeScreenDrawerContents(selectedScreen: Screen, onScreenSelected: (Screen) -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Screen.entries.forEach {
             NavigationDrawerItem(
@@ -253,7 +247,7 @@ private fun HomeScreenDrawerContents(
                     Text(it.text)
                 },
                 icon = {
-                    Icon(imageVector = it.icon, contentDescription = it.text)
+                    Icon(painter = painterResource(id = it.icon), contentDescription = it.text)
                 },
                 selected = selectedScreen == it,
                 onClick = {
@@ -266,9 +260,9 @@ private fun HomeScreenDrawerContents(
 
 private val DrawerWidth = 300.dp
 
-private enum class Screen(val text: String, val icon: ImageVector) {
-    Home("Home", Icons.Default.Home),
-    SleepDetails("Sleep", Icons.Default.Bedtime),
-    Leaderboard("Leaderboard", Icons.Default.Leaderboard),
-    Settings("Settings", Icons.Default.Settings),
+private enum class Screen(val text: String, @DrawableRes val icon: Int) {
+    Home("Home", R.drawable.ic_home),
+    SleepDetails("Sleep", R.drawable.ic_bedtime),
+    Leaderboard("Leaderboard", R.drawable.ic_leaderboard),
+    Settings("Settings", R.drawable.ic_settings),
 }

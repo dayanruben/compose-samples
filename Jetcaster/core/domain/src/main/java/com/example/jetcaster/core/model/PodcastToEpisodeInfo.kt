@@ -16,15 +16,13 @@
 
 package com.example.jetcaster.core.model
 
+import androidx.compose.runtime.Immutable
 import com.example.jetcaster.core.data.database.model.EpisodeToPodcast
 
-data class PodcastToEpisodeInfo(
-    val episode: EpisodeInfo,
-    val podcast: PodcastInfo,
-)
+@Immutable
+data class PodcastToEpisodeInfo(val episode: EpisodeInfo, val podcast: PodcastInfo)
 
-fun EpisodeToPodcast.asPodcastToEpisodeInfo(): PodcastToEpisodeInfo =
-    PodcastToEpisodeInfo(
-        episode = episode.asExternalModel(),
-        podcast = podcast.asExternalModel(),
-    )
+fun EpisodeToPodcast.asPodcastToEpisodeInfo(): PodcastToEpisodeInfo = PodcastToEpisodeInfo(
+    episode = episode.asExternalModel(),
+    podcast = podcast.asExternalModel(),
+)

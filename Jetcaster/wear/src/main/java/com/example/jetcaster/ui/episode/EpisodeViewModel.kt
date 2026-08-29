@@ -53,6 +53,7 @@ import kotlinx.coroutines.flow.stateIn
 /**
  * ViewModel that handles the business logic and screen state of the Episode screen.
  */
+@OptIn(ExperimentalHorologistApi::class)
 @HiltViewModel
 class EpisodeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -72,7 +73,7 @@ class EpisodeViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        null
+        null,
     )
 
     val uiState: StateFlow<EpisodeScreenState> =
@@ -102,9 +103,7 @@ sealed interface EpisodeScreenState {
 
     data object Loading : EpisodeScreenState
 
-    data class Loaded(
-        val episode: EpisodeToPodcast
-    ) : EpisodeScreenState
+    data class Loaded(val episode: EpisodeToPodcast) : EpisodeScreenState
 
     data object Empty : EpisodeScreenState
 }

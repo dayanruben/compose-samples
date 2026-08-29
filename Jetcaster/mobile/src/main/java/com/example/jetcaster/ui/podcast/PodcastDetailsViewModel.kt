@@ -17,12 +17,14 @@
 package com.example.jetcaster.ui.podcast
 
 import android.net.Uri
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetcaster.core.data.repository.EpisodeStore
 import com.example.jetcaster.core.data.repository.PodcastStore
 import com.example.jetcaster.core.model.EpisodeInfo
 import com.example.jetcaster.core.model.PodcastInfo
+import com.example.jetcaster.core.model.asDaoModel
 import com.example.jetcaster.core.model.asExternalModel
 import com.example.jetcaster.core.player.EpisodePlayer
 import com.example.jetcaster.core.player.model.PlayerEpisode
@@ -36,12 +38,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@Immutable
 sealed interface PodcastUiState {
     data object Loading : PodcastUiState
-    data class Ready(
-        val podcast: PodcastInfo,
-        val episodes: List<EpisodeInfo>,
-    ) : PodcastUiState
+    data class Ready(val podcast: PodcastInfo, val episodes: List<EpisodeInfo>) : PodcastUiState
 }
 
 /**
@@ -60,7 +60,7 @@ class PodcastDetailsViewModel @AssistedInject constructor(
     val state: StateFlow<PodcastUiState> =
         combine(
             podcastStore.podcastWithExtraInfo(decodedPodcastUri),
-            episodeStore.episodesInPodcast(decodedPodcastUri)
+            episodeStore.episodesInPodcast(decodedPodcastUri),
         ) { podcast, episodeToPodcasts ->
             val episodes = episodeToPodcasts.map { it.episode.asExternalModel() }
             PodcastUiState.Ready(
@@ -70,10 +70,10 @@ class PodcastDetailsViewModel @AssistedInject constructor(
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = PodcastUiState.Loading
+            initialValue = PodcastUiState.Loading,
         )
 
-    fun toggleSusbcribe(podcast: PodcastInfo) {
+    fun toggleSubscribe(podcast: PodcastInfo) {
         viewModelScope.launch {
             podcastStore.togglePodcastFollowed(podcast.uri)
         }
@@ -81,6 +81,12 @@ class PodcastDetailsViewModel @AssistedInject constructor(
 
     fun onQueueEpisode(playerEpisode: PlayerEpisode) {
         episodePlayer.addToQueue(playerEpisode)
+    }
+
+    fun deleteEpisode(episodeInfo: EpisodeInfo) {
+        viewModelScope.launch {
+            episodeStore.deleteEpisode(episodeInfo.asDaoModel())
+        }
     }
 
     @AssistedFactory

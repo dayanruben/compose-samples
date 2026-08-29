@@ -15,7 +15,6 @@
  */
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias libs.plugins.roborazzi
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -23,14 +22,14 @@ plugins {
 }
 
 android {
-    compileSdk 35
+    compileSdk 37
 
     namespace "com.example.jetcaster"
 
     defaultConfig {
         applicationId "com.example.jetcaster"
         minSdk 26
-        targetSdk 34
+        targetSdk 37
         versionCode 1
         versionName "1.0"
     }
@@ -54,26 +53,35 @@ android {
             includeAndroidResources true
         }
     }
-    
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.majorVersion
-        freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
-        freeCompilerArgs = freeCompilerArgs + "-opt-in=com.google.android.horologist.annotations.ExperimentalHorologistApi"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+            freeCompilerArgs.addAll([
+                "-opt-in=kotlin.RequiresOptIn",
+                "-opt-in=com.google.android.horologist.annotations.ExperimentalHorologistApi"
+            ])
+        }
     }
     buildFeatures {
         compose true
     }
-    
+
     packagingOptions {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "rome-utils-" + libs.rometools.rome.get().version + ".jar"
         }
     }
+
+    composeCompiler {
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
+        stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
+    }
 }
 
 dependencies {
-
 
     def composeBom = platform(libs.androidx.compose.bom)
 
@@ -90,21 +98,26 @@ dependencies {
     // https://issuetracker.google.com/issues/new?component=1077552&template=1598429&pli=1
     implementation libs.androidx.wear.compose.material
 
+    // For using the phone Typography
+    implementation libs.androidx.compose.material3
+
     implementation(libs.kotlinx.collections.immutable)
 
     // Foundation is additive, so you can use the mobile version in your Wear OS app.
     implementation libs.androidx.wear.compose.foundation
-    implementation(libs.androidx.material.icons.core)
-    implementation(libs.androidx.compose.material.iconsExtended)
 
-    // Horologist for correct Compose layout
-    implementation libs.horologist.composables
-    implementation libs.horologist.compose.layout
-    implementation libs.horologist.compose.material
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui.compose)
+    implementation(libs.androidx.media3.session)
+    implementation libs.androidx.media3.common.ktx
 
     //Horologist Media toolkit
     implementation libs.horologist.media.ui
+    implementation libs.horologist.media.uimaterial3
+    implementation libs.horologist.media.ui.model
     implementation libs.horologist.audio.ui
+    implementation libs.horologist.audio.uimaterial3
+    implementation libs.horologist.audio.ui.model
     implementation libs.horologist.media.data
     implementation libs.horologist.images.coil
 
@@ -140,9 +153,6 @@ dependencies {
     testImplementation libs.roborazzi
     testImplementation libs.roborazzi.compose
     testImplementation libs.roborazzi.rule
-    testImplementation(libs.horologist.roboscreenshots) {
-      exclude(group: "com.github.QuickBirdEng.kotlin-snapshot-testing")
-    }
 
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core

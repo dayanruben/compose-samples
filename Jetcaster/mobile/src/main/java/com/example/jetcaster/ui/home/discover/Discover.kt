@@ -24,8 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -35,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.jetcaster.R
@@ -53,6 +52,7 @@ fun LazyGridScope.discoverItems(
     podcastCategoryFilterResult: PodcastCategoryFilterResult,
     navigateToPodcastDetails: (PodcastInfo) -> Unit,
     navigateToPlayer: (EpisodeInfo) -> Unit,
+    removeFromQueue: (EpisodeInfo) -> Unit,
     onCategorySelected: (CategoryInfo) -> Unit,
     onTogglePodcastFollowed: (PodcastInfo) -> Unit,
     onQueueEpisode: (PlayerEpisode) -> Unit,
@@ -68,7 +68,7 @@ fun LazyGridScope.discoverItems(
         PodcastCategoryTabs(
             filterableCategoriesModel = filterableCategoriesModel,
             onCategorySelected = onCategorySelected,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(Modifier.height(8.dp))
@@ -80,6 +80,7 @@ fun LazyGridScope.discoverItems(
         navigateToPlayer = navigateToPlayer,
         onTogglePodcastFollowed = onTogglePodcastFollowed,
         onQueueEpisode = onQueueEpisode,
+        removeFromQueue = removeFromQueue,
     )
 }
 
@@ -87,10 +88,10 @@ fun LazyGridScope.discoverItems(
 private fun PodcastCategoryTabs(
     filterableCategoriesModel: FilterableCategoriesModel,
     onCategorySelected: (CategoryInfo) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val selectedIndex = filterableCategoriesModel.categories.indexOf(
-        filterableCategoriesModel.selectedCategory
+        filterableCategoriesModel.selectedCategory,
     )
     LazyRow(
         modifier = modifier,
@@ -99,7 +100,7 @@ private fun PodcastCategoryTabs(
     ) {
         itemsIndexed(
             items = filterableCategoriesModel.categories,
-            key = { i, category -> category.id }
+            key = { i, category -> category.id },
         ) { index, category ->
             ChoiceChipContent(
                 text = category.name,
@@ -113,21 +114,16 @@ private fun PodcastCategoryTabs(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ChoiceChipContent(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun ChoiceChipContent(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     FilterChip(
         selected = selected,
         onClick = onClick,
         leadingIcon = {
             if (selected) {
                 Icon(
-                    imageVector = Icons.Default.Check,
+                    painter = painterResource(id = R.drawable.ic_check),
                     contentDescription = stringResource(id = R.string.cd_selected_category),
-                    modifier = Modifier.height(18.dp)
+                    modifier = Modifier.height(18.dp),
                 )
             }
         },
@@ -144,7 +140,7 @@ private fun ChoiceChipContent(
             selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
             selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ),
-        shape = MaterialTheme.shapes.medium,
+        shape = MaterialTheme.shapes.large,
         border = null,
         modifier = modifier,
     )

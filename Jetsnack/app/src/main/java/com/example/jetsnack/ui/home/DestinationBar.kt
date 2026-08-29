@@ -25,8 +25,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +35,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -64,8 +63,8 @@ fun DestinationBar(modifier: Modifier = Modifier) {
                     .renderInSharedTransitionScopeOverlay()
                     .animateEnterExit(
                         enter = slideInVertically(spatialExpressiveSpring()) { -it * 2 },
-                        exit = slideOutVertically(spatialExpressiveSpring()) { -it * 2 }
-                    )
+                        exit = slideOutVertically(spatialExpressiveSpring()) { -it * 2 },
+                    ),
             ) {
                 TopAppBar(
                     windowInsets = WindowInsets(0, 0, 0, 0),
@@ -80,17 +79,17 @@ fun DestinationBar(modifier: Modifier = Modifier) {
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier
                                     .weight(1f)
-                                    .align(Alignment.CenterVertically)
+                                    .align(Alignment.CenterVertically),
                             )
                             IconButton(
                                 onClick = { /* todo */ },
-                                modifier = Modifier.align(Alignment.CenterVertically)
+                                modifier = Modifier.align(Alignment.CenterVertically),
                             ) {
                                 Icon(
-                                    imageVector = Icons.Outlined.ExpandMore,
+                                    painter = painterResource(id = R.drawable.ic_expand_more),
                                     tint = JetsnackTheme.colors.brand,
                                     contentDescription =
-                                    stringResource(R.string.label_select_delivery)
+                                        stringResource(R.string.label_select_delivery),
                                 )
                             }
                         }
@@ -98,7 +97,7 @@ fun DestinationBar(modifier: Modifier = Modifier) {
                     colors = TopAppBarDefaults.topAppBarColors().copy(
                         containerColor = JetsnackTheme.colors.uiBackground
                             .copy(alpha = AlphaNearOpaque),
-                        titleContentColor = JetsnackTheme.colors.textSecondary
+                        titleContentColor = JetsnackTheme.colors.textSecondary,
                     ),
                 )
                 JetsnackDivider()

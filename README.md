@@ -76,8 +76,8 @@ Looking for a sample that has the following features?
 ## Formatting
 
 To automatically format all samples: Run `./scripts/format.sh`
-To check one sample for errors: Navigate to the sample folder and run `./gradlew --init-script buildscripts/init.gradle.kts spotlessCheck`
-To format one sample: Navigate to the sample folder and run `./gradlew --init-script buildscripts/init.gradle.kts spotlessApply`
+To check one sample for errors: Navigate to the sample folder and run `./gradlew spotlessCheck`
+To format one sample: Navigate to the sample folder and run `./gradlew spotlessApply`
 
 ## Updates
 
@@ -87,7 +87,7 @@ To update dependencies to their new stable versions, run:
 ./scripts/updateDeps.sh
 ```
 
-To make any other manual updates to dependencies (ie add a new dependency or set an alpha version), update the `/scripts/libs.versions.toml` file with changes, and then run `duplicate_version_config.sh` to propogate the changes to all other samples. You can also update the  `toml-updater-config.gradle` file with changes that need to propogate to each sample. 
+Any other version updates need to be made individually.
 
 ## Obsolete Sample Projects
 
@@ -98,10 +98,10 @@ the most up to date resources.
 
 | Project                                          | Removed    | Commit                                                              |
 | ------------------------------------------------ | -----------|-------------------------------------------------------------------- |
-| [Crane](../../../tree/v2024.05.00/Crane)         | 2024-08-02 | [ee8e272](../../../commit/ee8e27289f4bc36304ee9f04397f49c35f402a65) |
-| [Owl](../../../tree/v2024.05.00/Owl)             | 2024-08-02 | [ee8e272](../../../commit/ee8e27289f4bc36304ee9f04397f49c35f402a65) |
-| [Jetsurvey](../../../tree/v2024.05.00/Jetsurvey) | 2024-08-02 | [ee8e272](../../../commit/ee8e27289f4bc36304ee9f04397f49c35f402a65) |
-| [Rally](../../../tree/v2024.05.00/Rally)         | 2024-08-02 | [ee8e272](../../../commit/ee8e27289f4bc36304ee9f04397f49c35f402a65) |
+| [Crane](../../tree/v2024.05.00/Crane)         | 2024-08-02 | [ee8e272](../../commit/ee8e27289f4bc36304ee9f04397f49c35f402a65) |
+| [Owl](../../tree/v2024.05.00/Owl)             | 2024-08-02 | [ee8e272](../../commit/ee8e27289f4bc36304ee9f04397f49c35f402a65) |
+| [Jetsurvey](../../tree/v2024.05.00/Jetsurvey) | 2024-08-02 | [ee8e272](../../commit/ee8e27289f4bc36304ee9f04397f49c35f402a65) |
+| [Rally](../../tree/v2024.05.00/Rally)         | 2024-08-02 | [ee8e272](../../commit/ee8e27289f4bc36304ee9f04397f49c35f402a65) |
 
 ## License
 ```

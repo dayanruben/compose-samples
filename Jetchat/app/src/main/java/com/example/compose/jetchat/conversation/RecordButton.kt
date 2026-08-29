@@ -31,13 +31,12 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TooltipState
@@ -49,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -65,18 +65,18 @@ fun RecordButton(
     onStartRecording: () -> Boolean,
     onFinishRecording: () -> Unit,
     onCancelRecording: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val transition = updateTransition(targetState = recording, label = "record")
     val scale = transition.animateFloat(
         transitionSpec = { spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow) },
         label = "record-scale",
-        targetValueByState = { rec -> if (rec) 2f else 1f }
+        targetValueByState = { rec -> if (rec) 2f else 1f },
     )
     val containerAlpha = transition.animateFloat(
         transitionSpec = { tween(2000) },
         label = "record-scale",
-        targetValueByState = { rec -> if (rec) 1f else 0f }
+        targetValueByState = { rec -> if (rec) 1f else 0f },
     )
     val iconColor = transition.animateColor(
         transitionSpec = { tween(200) },
@@ -84,7 +84,7 @@ fun RecordButton(
         targetValueByState = { rec ->
             if (rec) contentColorFor(LocalContentColor.current)
             else LocalContentColor.current
-        }
+        },
     )
 
     Box {
@@ -95,25 +95,28 @@ fun RecordButton(
                 .aspectRatio(1f)
                 .graphicsLayer {
                     alpha = containerAlpha.value
-                    scaleX = scale.value; scaleY = scale.value
+                    scaleX = scale.value
+                    scaleY = scale.value
                 }
                 .clip(CircleShape)
-                .background(LocalContentColor.current)
+                .background(LocalContentColor.current),
         )
         val scope = rememberCoroutineScope()
         val tooltipState = remember { TooltipState() }
         TooltipBox(
-            positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                positioning = TooltipAnchorPosition.Above,
+            ),
             tooltip = {
                 RichTooltip {
                     Text(stringResource(R.string.touch_and_hold_to_record))
                 }
             },
             enableUserInput = false,
-            state = tooltipState
+            state = tooltipState,
         ) {
             Icon(
-                Icons.Default.Mic,
+                painterResource(id = R.drawable.ic_mic),
                 contentDescription = stringResource(R.string.record_message),
                 tint = iconColor.value,
                 modifier = modifier
@@ -127,7 +130,7 @@ fun RecordButton(
                         onStartRecording = onStartRecording,
                         onFinishRecording = onFinishRecording,
                         onCancelRecording = onCancelRecording,
-                    )
+                    ),
             )
         }
     }
@@ -181,6 +184,6 @@ private fun Modifier.voiceRecordingGesture(
                         dragging = false
                     }
                 }
-            }
+            },
         )
     }

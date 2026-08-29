@@ -10,11 +10,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Copy CI gradle.properties
       run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
     - name: set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: 17
         distribution: 'zulu'
@@ -22,11 +22,9 @@ jobs:
 
     - name: Update dependencies
       run: ./scripts/updateDeps.sh
-    - name: Duplicate version configuration
-      run: ./scripts/duplicate_version_config.sh
     - name: Create pull request
       id: cpr
-      uses: peter-evans/create-pull-request@v7
+      uses: peter-evans/create-pull-request@v8
       with:
         token: ${{ secrets.PAT }}
         commit-message: 🤖 Update Dependencies

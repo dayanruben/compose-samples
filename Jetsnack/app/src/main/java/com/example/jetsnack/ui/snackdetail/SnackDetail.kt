@@ -62,8 +62,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -85,6 +83,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -130,12 +129,12 @@ private val HzPadding = Modifier.padding(horizontal = 24.dp)
 
 fun <T> spatialExpressiveSpring() = spring<T>(
     dampingRatio = 0.8f,
-    stiffness = 380f
+    stiffness = 380f,
 )
 
 fun <T> nonSpatialExpressiveSpring() = spring<T>(
     dampingRatio = 1f,
-    stiffness = 1600f
+    stiffness = 1600f,
 )
 
 val snackDetailBoundsTransform = BoundsTransform { _, _ ->
@@ -143,11 +142,7 @@ val snackDetailBoundsTransform = BoundsTransform { _, _ ->
 }
 
 @Composable
-fun SnackDetail(
-    snackId: Long,
-    origin: String,
-    upPress: () -> Unit
-) {
+fun SnackDetail(snackId: Long, origin: String, upPress: () -> Unit) {
     val snack = remember(snackId) { SnackRepo.getSnack(snackId) }
     val related = remember(snackId) { SnackRepo.getRelated(snackId) }
     val sharedTransitionScope = LocalSharedTransitionScope.current
@@ -171,18 +166,18 @@ fun SnackDetail(
                         key = SnackSharedElementKey(
                             snackId = snack.id,
                             origin = origin,
-                            type = SnackSharedElementType.Bounds
-                        )
+                            type = SnackSharedElementType.Bounds,
+                        ),
                     ),
                     animatedVisibilityScope,
                     clipInOverlayDuringTransition =
-                    OverlayClip(RoundedCornerShape(roundedCornerAnim)),
+                        OverlayClip(RoundedCornerShape(roundedCornerAnim)),
                     boundsTransform = snackDetailBoundsTransform,
                     exit = fadeOut(nonSpatialExpressiveSpring()),
                     enter = fadeIn(nonSpatialExpressiveSpring()),
                 )
                 .fillMaxSize()
-                .background(color = JetsnackTheme.colors.uiBackground)
+                .background(color = JetsnackTheme.colors.uiBackground),
         ) {
             val scroll = rememberScrollState(0)
             Header(snack.id, origin = origin)
@@ -214,9 +209,9 @@ private fun Header(snackId: Long, origin: String) {
             targetValue = targetOffset,
             animationSpec = infiniteRepeatable(
                 tween(50000, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
+                repeatMode = RepeatMode.Reverse,
             ),
-            label = "offset"
+            label = "offset",
         )
         Spacer(
             modifier = Modifier
@@ -225,14 +220,14 @@ private fun Header(snackId: Long, origin: String) {
                         key = SnackSharedElementKey(
                             snackId = snackId,
                             origin = origin,
-                            type = SnackSharedElementType.Background
-                        )
+                            type = SnackSharedElementType.Background,
+                        ),
                     ),
                     animatedVisibilityScope = animatedVisibilityScope,
                     boundsTransform = snackDetailBoundsTransform,
                     enter = fadeIn(nonSpatialExpressiveSpring()),
                     exit = fadeOut(nonSpatialExpressiveSpring()),
-                    resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
                 )
                 .height(280.dp)
                 .fillMaxWidth()
@@ -243,12 +238,12 @@ private fun Header(snackId: Long, origin: String) {
                         colors = brushColors,
                         start = Offset(offset, offset),
                         end = Offset(offset + brushSize, offset + brushSize),
-                        tileMode = TileMode.Mirror
+                        tileMode = TileMode.Mirror,
                     )
                     onDrawBehind {
                         drawRect(brush)
                     }
-                }
+                },
         )
     }
 }
@@ -267,15 +262,15 @@ private fun SharedTransitionScope.Up(upPress: () -> Unit) {
                 .size(36.dp)
                 .animateEnterExit(
                     enter = scaleIn(tween(300, delayMillis = 300)),
-                    exit = scaleOut(tween(20))
+                    exit = scaleOut(tween(20)),
                 )
                 .background(
                     color = Neutral8.copy(alpha = 0.32f),
-                    shape = CircleShape
-                )
+                    shape = CircleShape,
+                ),
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                painter = painterResource(id = R.drawable.ic_arrow_back),
                 tint = JetsnackTheme.colors.iconInteractive,
                 contentDescription = stringResource(R.string.label_back),
             )
@@ -284,10 +279,7 @@ private fun SharedTransitionScope.Up(upPress: () -> Unit) {
 }
 
 @Composable
-private fun Body(
-    related: List<SnackCollection>,
-    scroll: ScrollState
-) {
+private fun Body(related: List<SnackCollection>, scroll: ScrollState) {
     val sharedTransitionScope =
         LocalSharedTransitionScope.current ?: throw IllegalStateException("No scope found")
     with(sharedTransitionScope) {
@@ -296,11 +288,11 @@ private fun Body(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
-                    .height(MinTitleOffset)
+                    .height(MinTitleOffset),
             )
 
             Column(
-                modifier = Modifier.verticalScroll(scroll)
+                modifier = Modifier.verticalScroll(scroll),
             ) {
                 Spacer(Modifier.height(GradientScroll))
                 Spacer(Modifier.height(ImageOverlap))
@@ -315,7 +307,7 @@ private fun Body(
                             text = stringResource(R.string.detail_header),
                             style = MaterialTheme.typography.labelSmall,
                             color = JetsnackTheme.colors.textHelp,
-                            modifier = HzPadding
+                            modifier = HzPadding,
                         )
                         Spacer(Modifier.height(16.dp))
                         var seeMore by remember { mutableStateOf(true) }
@@ -326,7 +318,7 @@ private fun Body(
                                 color = JetsnackTheme.colors.textHelp,
                                 maxLines = if (seeMore) 5 else Int.MAX_VALUE,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = HzPadding.skipToLookaheadSize()
+                                modifier = HzPadding.skipToLookaheadSize(),
 
                             )
                         }
@@ -348,7 +340,7 @@ private fun Body(
                                 .clickable {
                                     seeMore = !seeMore
                                 }
-                                .skipToLookaheadSize()
+                                .skipToLookaheadSize(),
                         )
 
                         Spacer(Modifier.height(40.dp))
@@ -356,14 +348,14 @@ private fun Body(
                             text = stringResource(R.string.ingredients),
                             style = MaterialTheme.typography.labelSmall,
                             color = JetsnackTheme.colors.textHelp,
-                            modifier = HzPadding
+                            modifier = HzPadding,
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = stringResource(R.string.ingredients_list),
                             style = MaterialTheme.typography.bodyLarge,
                             color = JetsnackTheme.colors.textHelp,
-                            modifier = HzPadding
+                            modifier = HzPadding,
                         )
 
                         Spacer(Modifier.height(16.dp))
@@ -374,7 +366,7 @@ private fun Body(
                                 SnackCollection(
                                     snackCollection = snackCollection,
                                     onSnackClick = { _, _ -> },
-                                    highlight = false
+                                    highlight = false,
                                 )
                             }
                         }
@@ -383,7 +375,7 @@ private fun Body(
                             modifier = Modifier
                                 .padding(bottom = BottomBarHeight)
                                 .navigationBarsPadding()
-                                .height(8.dp)
+                                .height(8.dp),
                         )
                     }
                 }
@@ -413,7 +405,7 @@ private fun Title(snack: Snack, origin: String, scrollProvider: () -> Int) {
                     val offset = (maxOffset - scroll).coerceAtLeast(minOffset)
                     IntOffset(x = 0, y = offset.toInt())
                 }
-                .background(JetsnackTheme.colors.uiBackground)
+                .background(JetsnackTheme.colors.uiBackground),
         ) {
             Spacer(Modifier.height(16.dp))
             Text(
@@ -427,13 +419,13 @@ private fun Title(snack: Snack, origin: String, scrollProvider: () -> Int) {
                             key = SnackSharedElementKey(
                                 snackId = snack.id,
                                 origin = origin,
-                                type = SnackSharedElementType.Title
-                            )
+                                type = SnackSharedElementType.Title,
+                            ),
                         ),
                         animatedVisibilityScope = animatedVisibilityScope,
-                        boundsTransform = snackDetailBoundsTransform
+                        boundsTransform = snackDetailBoundsTransform,
                     )
-                    .wrapContentWidth()
+                    .wrapContentWidth(),
             )
             Text(
                 text = snack.tagline,
@@ -447,13 +439,13 @@ private fun Title(snack: Snack, origin: String, scrollProvider: () -> Int) {
                             key = SnackSharedElementKey(
                                 snackId = snack.id,
                                 origin = origin,
-                                type = SnackSharedElementType.Tagline
-                            )
+                                type = SnackSharedElementType.Tagline,
+                            ),
                         ),
                         animatedVisibilityScope = animatedVisibilityScope,
-                        boundsTransform = snackDetailBoundsTransform
+                        boundsTransform = snackDetailBoundsTransform,
                     )
-                    .wrapContentWidth()
+                    .wrapContentWidth(),
             )
             Spacer(Modifier.height(4.dp))
             with(animatedVisibilityScope) {
@@ -464,9 +456,9 @@ private fun Title(snack: Snack, origin: String, scrollProvider: () -> Int) {
                     modifier = HzPadding
                         .animateEnterExit(
                             enter = fadeIn() + slideInVertically { -it / 3 },
-                            exit = fadeOut() + slideOutVertically { -it / 3 }
+                            exit = fadeOut() + slideOutVertically { -it / 3 },
                         )
-                        .skipToLookaheadSize()
+                        .skipToLookaheadSize(),
                 )
             }
             Spacer(Modifier.height(8.dp))
@@ -481,7 +473,7 @@ private fun Image(
     origin: String,
     @DrawableRes
     imageRes: Int,
-    scrollProvider: () -> Int
+    scrollProvider: () -> Int,
 ) {
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
     val collapseFractionProvider = {
@@ -490,7 +482,7 @@ private fun Image(
 
     CollapsingImageLayout(
         collapseFractionProvider = collapseFractionProvider,
-        modifier = HzPadding.statusBarsPadding()
+        modifier = HzPadding.statusBarsPadding(),
     ) {
         val sharedTransitionScope = LocalSharedTransitionScope.current
             ?: throw IllegalStateException("No sharedTransitionScope found")
@@ -507,15 +499,15 @@ private fun Image(
                             key = SnackSharedElementKey(
                                 snackId = snackId,
                                 origin = origin,
-                                type = SnackSharedElementType.Image
-                            )
+                                type = SnackSharedElementType.Image,
+                            ),
                         ),
                         animatedVisibilityScope = animatedVisibilityScope,
                         exit = fadeOut(),
                         enter = fadeIn(),
-                        boundsTransform = snackDetailBoundsTransform
+                        boundsTransform = snackDetailBoundsTransform,
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
 
             )
         }
@@ -523,14 +515,10 @@ private fun Image(
 }
 
 @Composable
-private fun CollapsingImageLayout(
-    collapseFractionProvider: () -> Float,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
+private fun CollapsingImageLayout(collapseFractionProvider: () -> Float, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Layout(
         modifier = modifier,
-        content = content
+        content = content,
     ) { measurables, constraints ->
         check(measurables.size == 1)
 
@@ -545,11 +533,11 @@ private fun CollapsingImageLayout(
         val imageX = lerp(
             (constraints.maxWidth - imageWidth) / 2, // centered when expanded
             constraints.maxWidth - imageWidth, // right aligned when collapsed
-            collapseFraction
+            collapseFraction,
         )
         layout(
             width = constraints.maxWidth,
-            height = imageY + imageWidth
+            height = imageY + imageWidth,
         ) {
             imagePlaceable.placeRelative(imageX, imageY)
         }
@@ -572,12 +560,12 @@ private fun CartBottomBar(modifier: Modifier = Modifier) {
                         enter = slideInVertically(
                             tween(
                                 300,
-                                delayMillis = 300
-                            )
+                                delayMillis = 300,
+                            ),
                         ) { it } + fadeIn(tween(300, delayMillis = 300)),
                         exit = slideOutVertically(tween(50)) { it } +
-                            fadeOut(tween(50))
-                    )
+                            fadeOut(tween(50)),
+                    ),
             ) {
                 Column {
                     JetsnackDivider()
@@ -586,23 +574,23 @@ private fun CartBottomBar(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .navigationBarsPadding()
                             .then(HzPadding)
-                            .heightIn(min = BottomBarHeight)
+                            .heightIn(min = BottomBarHeight),
                     ) {
                         QuantitySelector(
                             count = count,
                             decreaseItemCount = { if (count > 0) updateCount(count - 1) },
-                            increaseItemCount = { updateCount(count + 1) }
+                            increaseItemCount = { updateCount(count + 1) },
                         )
                         Spacer(Modifier.width(16.dp))
                         JetsnackButton(
                             onClick = { /* todo */ },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         ) {
                             Text(
                                 text = stringResource(R.string.add_to_cart),
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center,
-                                maxLines = 1
+                                maxLines = 1,
                             )
                         }
                     }
@@ -621,7 +609,7 @@ private fun SnackDetailPreview() {
         SnackDetail(
             snackId = 1L,
             origin = "details",
-            upPress = { }
+            upPress = { },
         )
     }
 }

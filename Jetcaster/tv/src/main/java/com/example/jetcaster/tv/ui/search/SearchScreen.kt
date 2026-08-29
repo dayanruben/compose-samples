@@ -32,11 +32,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,10 +43,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.FilterChip
 import androidx.tv.material3.Icon
@@ -68,19 +67,20 @@ import com.example.jetcaster.tv.ui.theme.JetcasterAppDefaults
 fun SearchScreen(
     onPodcastSelected: (PodcastInfo) -> Unit,
     modifier: Modifier = Modifier,
-    searchScreenViewModel: SearchScreenViewModel = hiltViewModel()
+    searchScreenViewModel: SearchScreenViewModel = hiltViewModel(),
 ) {
-    val uiState by searchScreenViewModel.uiStateFlow.collectAsState()
+    val uiState by searchScreenViewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     when (val s = uiState) {
         SearchScreenUiState.Loading -> Loading(modifier = modifier)
+
         is SearchScreenUiState.Ready -> Ready(
             keyword = s.keyword,
             categorySelectionList = s.categorySelectionList,
             onKeywordInput = searchScreenViewModel::setKeyword,
             onCategorySelected = searchScreenViewModel::addCategoryToSelectedCategoryList,
             onCategoryUnselected = searchScreenViewModel::removeCategoryFromSelectedCategoryList,
-            modifier = modifier
+            modifier = modifier,
         )
 
         is SearchScreenUiState.HasResult -> HasResult(
@@ -103,7 +103,7 @@ private fun Ready(
     onKeywordInput: (String) -> Unit,
     onCategorySelected: (CategoryInfo) -> Unit,
     onCategoryUnselected: (CategoryInfo) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Controls(
         keyword = keyword,
@@ -112,7 +112,7 @@ private fun Ready(
         onCategorySelected = onCategorySelected,
         onCategoryUnselected = onCategoryUnselected,
         modifier = modifier,
-        toRequestFocus = true
+        toRequestFocus = true,
     )
 }
 
@@ -125,7 +125,7 @@ private fun HasResult(
     onCategorySelected: (CategoryInfo) -> Unit,
     onCategoryUnselected: (CategoryInfo) -> Unit,
     onPodcastSelected: (PodcastInfo) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SearchResult(
         podcastList = podcastList,
@@ -139,7 +139,7 @@ private fun HasResult(
                 onCategoryUnselected = onCategoryUnselected,
             )
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -153,7 +153,7 @@ private fun Controls(
     onCategoryUnselected: (CategoryInfo) -> Unit,
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester = remember { FocusRequester() },
-    toRequestFocus: Boolean = false
+    toRequestFocus: Boolean = false,
 ) {
     LaunchedEffect(toRequestFocus) {
         if (toRequestFocus) {
@@ -163,7 +163,7 @@ private fun Controls(
 
     Column(
         verticalArrangement = Arrangement.spacedBy(JetcasterAppDefaults.gap.item),
-        modifier = modifier
+        modifier = modifier,
     ) {
         KeywordInput(
             keyword = keyword,
@@ -175,19 +175,15 @@ private fun Controls(
             onCategoryUnselected = onCategoryUnselected,
             modifier = Modifier
                 .focusRestorer()
-                .focusRequester(focusRequester)
+                .focusRequester(focusRequester),
         )
     }
 }
 
 @Composable
-private fun KeywordInput(
-    keyword: String,
-    onKeywordInput: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun KeywordInput(keyword: String, onKeywordInput: (String) -> Unit, modifier: Modifier = Modifier) {
     val textStyle = MaterialTheme.typography.bodyMedium.copy(
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     val cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
     BasicTextField(
@@ -203,22 +199,22 @@ private fun KeywordInput(
                     .fillMaxWidth()
                     .background(
                         MaterialTheme.colorScheme.surfaceVariant,
-                        RoundedCornerShape(percent = 50)
-                    )
+                        RoundedCornerShape(percent = 50),
+                    ),
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        Icons.Default.Search,
+                        painterResource(id = R.drawable.ic_search),
                         contentDescription = stringResource(R.string.label_search),
-                        modifier = Modifier.padding(end = 12.dp)
+                        modifier = Modifier.padding(end = 12.dp),
                     )
                     innerTextField()
                 }
             }
-        }
+        },
     )
 }
 
@@ -228,7 +224,7 @@ private fun CategorySelection(
     categorySelectionList: CategorySelectionList,
     onCategorySelected: (CategoryInfo) -> Unit,
     onCategoryUnselected: (CategoryInfo) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     FlowRow(
         modifier = modifier,
@@ -244,7 +240,7 @@ private fun CategorySelection(
                     } else {
                         onCategorySelected(it.categoryInfo)
                     }
-                }
+                },
             ) {
                 Text(text = it.categoryInfo.name)
             }
@@ -262,7 +258,7 @@ private fun SearchResult(
     LazyVerticalGrid(
         columns = GridCells.Fixed(4),
         horizontalArrangement =
-        Arrangement.spacedBy(JetcasterAppDefaults.gap.podcastRow),
+            Arrangement.spacedBy(JetcasterAppDefaults.gap.podcastRow),
         verticalArrangement = Arrangement.spacedBy(JetcasterAppDefaults.gap.podcastRow),
         modifier = modifier,
     ) {

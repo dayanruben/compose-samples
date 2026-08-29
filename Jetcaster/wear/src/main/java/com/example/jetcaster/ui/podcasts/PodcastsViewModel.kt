@@ -31,10 +31,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
+@OptIn(ExperimentalHorologistApi::class)
 @HiltViewModel
-class PodcastsViewModel @Inject constructor(
-    podcastStore: PodcastStore,
-) : ViewModel() {
+class PodcastsViewModel @Inject constructor(podcastStore: PodcastStore) : ViewModel() {
 
     val uiState: StateFlow<PodcastsScreenState> =
         podcastStore.followedPodcastsSortedByLastEpisode(limit = 10).map {
@@ -57,10 +56,7 @@ object PodcastMapper {
     /**
      * Maps from [Podcast].
      */
-    fun map(
-        podcastWithExtraInfo: PodcastWithExtraInfo,
-    ): PodcastInfo =
-        podcastWithExtraInfo.asExternalModel()
+    fun map(podcastWithExtraInfo: PodcastWithExtraInfo): PodcastInfo = podcastWithExtraInfo.asExternalModel()
 }
 
 @ExperimentalHorologistApi
@@ -68,9 +64,7 @@ sealed interface PodcastsScreenState {
 
     data object Loading : PodcastsScreenState
 
-    data class Loaded(
-        val podcastList: List<PodcastInfo>,
-    ) : PodcastsScreenState
+    data class Loaded(val podcastList: List<PodcastInfo>) : PodcastsScreenState
 
     data object Empty : PodcastsScreenState
 }

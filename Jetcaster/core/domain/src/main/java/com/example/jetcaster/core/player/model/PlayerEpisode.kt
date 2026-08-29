@@ -16,6 +16,7 @@
 
 package com.example.jetcaster.core.player.model
 
+import androidx.compose.runtime.Immutable
 import com.example.jetcaster.core.data.database.model.EpisodeToPodcast
 import com.example.jetcaster.core.model.EpisodeInfo
 import com.example.jetcaster.core.model.PodcastInfo
@@ -25,6 +26,8 @@ import java.time.OffsetDateTime
 /**
  * Episode data with necessary information to be used within a player.
  */
+
+@Immutable
 data class PlayerEpisode(
     val uri: String = "",
     val title: String = "",
@@ -35,6 +38,7 @@ data class PlayerEpisode(
     val author: String = "",
     val summary: String = "",
     val podcastImageUrl: String = "",
+    val mediaUrls: List<String> = emptyList<String>(),
 ) {
     constructor(podcastInfo: PodcastInfo, episodeInfo: EpisodeInfo) : this(
         title = episodeInfo.title,
@@ -45,19 +49,20 @@ data class PlayerEpisode(
         author = episodeInfo.author,
         summary = episodeInfo.summary,
         podcastImageUrl = podcastInfo.imageUrl,
-        uri = episodeInfo.uri
+        uri = episodeInfo.uri,
+        mediaUrls = episodeInfo.mediaUrls,
     )
 }
 
-fun EpisodeToPodcast.toPlayerEpisode(): PlayerEpisode =
-    PlayerEpisode(
-        uri = episode.uri,
-        title = episode.title,
-        subTitle = episode.subtitle ?: "",
-        published = episode.published,
-        duration = episode.duration,
-        podcastName = podcast.title,
-        author = episode.author ?: podcast.author ?: "",
-        summary = episode.summary ?: "",
-        podcastImageUrl = podcast.imageUrl ?: "",
-    )
+fun EpisodeToPodcast.toPlayerEpisode(): PlayerEpisode = PlayerEpisode(
+    uri = episode.uri,
+    title = episode.title,
+    subTitle = episode.subtitle ?: "",
+    published = episode.published,
+    duration = episode.duration,
+    podcastName = podcast.title,
+    author = episode.author ?: podcast.author ?: "",
+    summary = episode.summary ?: "",
+    podcastImageUrl = podcast.imageUrl ?: "",
+    mediaUrls = episode.mediaUrls,
+)

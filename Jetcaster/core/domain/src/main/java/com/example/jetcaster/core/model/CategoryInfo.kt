@@ -16,17 +16,15 @@
 
 package com.example.jetcaster.core.model
 
+import androidx.compose.runtime.Immutable
 import com.example.jetcaster.core.data.database.model.Category
 
-data class CategoryInfo(
-    val id: Long,
-    val name: String
-)
+@Immutable
+data class CategoryInfo(val id: Long, val name: String)
 
 const val CategoryTechnology = "Technology"
 
-fun Category.asExternalModel() =
-    CategoryInfo(
-        id = id,
-        name = name
-    )
+fun Category.asExternalModel() = CategoryInfo(
+    id = id,
+    name = name,
+)

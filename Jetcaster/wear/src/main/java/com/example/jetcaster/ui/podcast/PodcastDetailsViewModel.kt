@@ -38,11 +38,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetcaster.core.data.repository.EpisodeStore
 import com.example.jetcaster.core.data.repository.PodcastStore
+import com.example.jetcaster.core.model.PodcastInfo
 import com.example.jetcaster.core.model.asExternalModel
 import com.example.jetcaster.core.player.EpisodePlayer
 import com.example.jetcaster.core.player.model.PlayerEpisode
 import com.example.jetcaster.core.player.model.toPlayerEpisode
 import com.example.jetcaster.ui.PodcastDetails
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,12 +58,13 @@ import kotlinx.coroutines.flow.stateIn
 /**
  * ViewModel that handles the business logic and screen state of the Podcast details screen.
  */
+@OptIn(ExperimentalHorologistApi::class)
 @HiltViewModel
 class PodcastDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     episodeStore: EpisodeStore,
     private val episodePlayer: EpisodePlayer,
-    podcastStore: PodcastStore
+    podcastStore: PodcastStore,
 ) : ViewModel() {
 
     private val podcastUri: String =
@@ -76,7 +79,7 @@ class PodcastDetailsViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        null
+        null,
     )
 
     private val episodeListFlow = podcastFlow.flatMapLatest {
@@ -92,7 +95,7 @@ class PodcastDetailsViewModel @Inject constructor(
     val uiState: StateFlow<PodcastDetailsScreenState> =
         combine(
             podcastFlow,
-            episodeListFlow
+            episodeListFlow,
         ) { podcast, episodes ->
             if (podcast != null) {
                 PodcastDetailsScreenState.Loaded(
@@ -113,4 +116,14 @@ class PodcastDetailsViewModel @Inject constructor(
         episodePlayer.currentEpisode = episodes[0]
         episodePlayer.play(episodes)
     }
+}
+
+@ExperimentalHorologistApi
+sealed class PodcastDetailsScreenState {
+
+    data object Loading : PodcastDetailsScreenState()
+
+    data class Loaded(val episodeList: List<PlayerEpisode>, val podcast: PodcastInfo) : PodcastDetailsScreenState()
+
+    data object Empty : PodcastDetailsScreenState()
 }

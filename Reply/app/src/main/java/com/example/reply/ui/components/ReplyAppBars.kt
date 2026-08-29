@@ -25,10 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
@@ -50,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.reply.R
@@ -57,11 +54,7 @@ import com.example.reply.data.Email
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReplyDockedSearchBar(
-    emails: List<Email>,
-    onSearchItemSelected: (Email) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun ReplyDockedSearchBar(emails: List<Email>, onSearchItemSelected: (Email) -> Unit, modifier: Modifier = Modifier) {
     var query by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     val searchResults = remember { mutableStateListOf<Email>() }
@@ -76,13 +69,14 @@ fun ReplyDockedSearchBar(
                 emails.filter {
                     it.subject.startsWith(
                         prefix = query,
-                        ignoreCase = true
-                    ) || it.sender.fullName.startsWith(
-                        prefix =
-                        query,
-                        ignoreCase = true
-                    )
-                }
+                        ignoreCase = true,
+                    ) ||
+                        it.sender.fullName.startsWith(
+                            prefix =
+                            query,
+                            ignoreCase = true,
+                        )
+                },
             )
         }
     }
@@ -102,7 +96,7 @@ fun ReplyDockedSearchBar(
                 leadingIcon = {
                     if (expanded) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.ic_arrow_back),
                             contentDescription = stringResource(id = R.string.back_button),
                             modifier = Modifier
                                 .padding(start = 16.dp)
@@ -113,7 +107,7 @@ fun ReplyDockedSearchBar(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Default.Search,
+                            painter = painterResource(id = R.drawable.ic_search),
                             contentDescription = stringResource(id = R.string.search),
                             modifier = Modifier.padding(start = 16.dp),
                         )
@@ -125,7 +119,7 @@ fun ReplyDockedSearchBar(
                         description = stringResource(id = R.string.profile),
                         modifier = Modifier
                             .padding(12.dp)
-                            .size(32.dp)
+                            .size(32.dp),
                     )
                 },
             )
@@ -138,7 +132,7 @@ fun ReplyDockedSearchBar(
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     items(items = searchResults, key = { it.id }) { email ->
                         ListItem(
@@ -149,60 +143,55 @@ fun ReplyDockedSearchBar(
                                     drawableResource = email.sender.avatar,
                                     description = stringResource(id = R.string.profile),
                                     modifier = Modifier
-                                        .size(32.dp)
+                                        .size(32.dp),
                                 )
                             },
                             modifier = Modifier.clickable {
                                 onSearchItemSelected.invoke(email)
                                 query = ""
                                 expanded = false
-                            }
+                            },
                         )
                     }
                 }
             } else if (query.isNotEmpty()) {
                 Text(
                     text = stringResource(id = R.string.no_item_found),
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 )
             } else
                 Text(
                     text = stringResource(id = R.string.no_search_history),
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 )
-        }
+        },
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmailDetailAppBar(
-    email: Email,
-    isFullScreen: Boolean,
-    modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit
-) {
+fun EmailDetailAppBar(email: Email, isFullScreen: Boolean, modifier: Modifier = Modifier, onBackPressed: () -> Unit) {
     TopAppBar(
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.inverseOnSurface
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface,
         ),
         title = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = if (isFullScreen) Alignment.CenterHorizontally
-                else Alignment.Start
+                else Alignment.Start,
             ) {
                 Text(
                     text = email.subject,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
                     text = "${email.threads.size} ${stringResource(id = R.string.messages)}",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.outline,
                 )
             }
         },
@@ -213,13 +202,13 @@ fun EmailDetailAppBar(
                     modifier = Modifier.padding(8.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        painter = painterResource(id = R.drawable.ic_arrow_back),
                         contentDescription = stringResource(id = R.string.back_button),
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(14.dp),
                     )
                 }
             }
@@ -229,11 +218,11 @@ fun EmailDetailAppBar(
                 onClick = { /*TODO*/ },
             ) {
                 Icon(
-                    imageVector = Icons.Default.MoreVert,
+                    painter = painterResource(id = R.drawable.ic_more_vert),
                     contentDescription = stringResource(id = R.string.more_options_button),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        }
+        },
     )
 }
